@@ -1,1 +1,17 @@
-# devops-portfolio
+# DevOps Portfolio
+
+## Про мене
+- Я Андрей Васильович Цугуй
+- Мета: Розвиватися в DevOps, автоматизація процесів, CI/CD  
+
+## Цілі в DevOps
+- Навчитися GitHub Actions, Docker...  
+- Реалізувати власні проєкти для портфоліо  
+
+## План розвитку
+1. Вивчення контейнеризації (Docker)  
+2. Автоматизація CI/CD (GitHub Actions)  
+3. Моніторинг та логування  
+
+## Контакти
+- Email:  tsuhui.andrei@chnu.edu.ua
