@@ -21,7 +21,7 @@ jobs:
         if: github.event.action == 'opened'
         run: |
           # Add PR to project
-          ITEM_ID=$(gh project item-add 4 --owner "@me" --url ${{ github.event.pull_request.html_url }} --json id -q ".id")
+          ITEM_ID=$(gh project item-add 4 --owner "@me" --url ${{ github.event.pull_request.html_url }} --format json -q ".id")
           echo "PR added with item ID $ITEM_ID"
 
           # Move to Review
