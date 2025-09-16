@@ -17,36 +17,43 @@ jobs:
       - name: Authenticate GitHub CLI
         run: echo "${{ github.token }}" | gh auth login --with-token
 
-      - name: Move PR to "Review" when opened
+      - name: Add PR to project if not exists & move to Review
         if: github.event.action == 'opened'
         run: |
-          gh api graphql -f query='
+          # Add PR to project
+          ITEM_ID=$(gh project item-add --project 4 --content-id ${{ github.event.pull_request.node_id }} --json id -q ".id")
+          echo "PR added with item ID $ITEM_ID"
+
+          # Move to Review
+          gh api graphql -f query="
             mutation {
               updateProjectV2ItemFieldValue(
                 input: {
-                  projectId: "PVT_kwHOCYwIqs4BCszZ"
-                  itemId: "${{ github.event.pull_request.node_id }}"
-                  fieldId: "PVTSSF_lAHOCYwIqs4BCszZzg01Zuk"
-                  value: { singleSelectOptionId: "9526636c" }
+                  projectId: \"PVT_kwHOCYwIqs4BCszZ\"
+                  itemId: \"$ITEM_ID\"
+                  fieldId: \"PVTSSF_lAHOCYwIqs4BCszZzg01Zuk\"
+                  value: { singleSelectOptionId: \"9526636c\" }
                 }
               ) {
                 projectV2Item { id }
               }
-            }'
+            }"
 
-      - name: Move PR to "Done" when merged
+      - name: Move PR to Done when merged
         if: github.event.action == 'closed' && github.event.pull_request.merged == true
         run: |
-          gh api graphql -f query='
+          # Move PR card to Done
+          ITEM_ID=$(gh project item-list 4 --json id,content --jq ".[] | select(.content.id==\"${{ github.event.pull_request.node_id }}\") | .id")
+          gh api graphql -f query="
             mutation {
               updateProjectV2ItemFieldValue(
                 input: {
-                  projectId: "PVT_kwHOCYwIqs4BCszZ"
-                  itemId: "${{ github.event.pull_request.node_id }}"
-                  fieldId: "PVTSSF_lAHOCYwIqs4BCszZzg01Zuk"
-                  value: { singleSelectOptionId: "98236657" }
+                  projectId: \"PVT_kwHOCYwIqs4BCszZ\"
+                  itemId: \"$ITEM_ID\"
+                  fieldId: \"PVTSSF_lAHOCYwIqs4BCszZzg01Zuk\"
+                  value: { singleSelectOptionId: \"98236657\" }
                 }
               ) {
                 projectV2Item { id }
               }
-            }'
+            }"
