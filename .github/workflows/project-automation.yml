@@ -6,7 +6,7 @@ on:
 
 jobs:
   update-project:
-    runs-on: ubuntu-22.04  # Явно вкажіть для стабільності
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       pull-requests: write
@@ -17,9 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4  # Для доступу до репозиторію
 
-      - name: Setup GitHub CLI
-        uses: cli/setup-gh@v0  # Встановлює останню версію gh CLI
-
       - name: Authenticate GitHub CLI with Classic PAT
         run: echo "${{ secrets.GH_PAT }}" | gh auth login --with-token
 
@@ -27,6 +24,8 @@ jobs:
         run: |
           gh auth status  # Перевіряємо scopes токена
           echo "Authenticated as: $(gh api user --jq .login)"
+          # Перевірка версії gh CLI
+          gh --version
           # Перевірка доступу до проєкту 4
           gh api graphql -f query='
             query {
