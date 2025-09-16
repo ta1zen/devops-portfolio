@@ -66,3 +66,42 @@ jobs:
               }
             }" --jq '.data.updateProjectV2ItemFieldValue.projectV2Item.id')
           echo "Updated item ID: $RESPONSE"
+          
+      - name: Move PR to Done if merged
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
+        run: |
+          # Find the item ID for the PR in the project
+          ITEM_ID=$(gh api graphql -f query='
+            query {
+              node(id: "PVT_kwHOCYwIqs4BCszZ") {
+                ... on ProjectV2 {
+                  items(first: 100, filter: {content: {url: "${{ github.event.pull_request.html_url }}"}}) {
+                    nodes {
+                      id
+                    }
+                  }
+                }
+              }
+            }' --jq '.data.node.items.nodes[0].id')
+          
+          if [ -z "$ITEM_ID" ]; then
+            echo "Error: PR not found in project"
+            exit 1
+          fi
+          echo "Found item ID: $ITEM_ID"
+      
+          # Move to Done
+          RESPONSE=$(gh api graphql -f query="
+            mutation {
+              updateProjectV2ItemFieldValue(
+                input: {
+                  projectId: \"PVT_kwHOCYwIqs4BCszZ\"
+                  itemId: \"$ITEM_ID\"
+                  fieldId: \"PVTSSF_lAHOCYwIqs4BCszZzg01Zuk\"
+                  value: { singleSelectOptionId: \"98236657\" }
+                }
+              ) {
+                projectV2Item { id }
+              }
+            }" --jq '.data.updateProjectV2ItemFieldValue.projectV2Item.id')
+          echo "Moved to Done, updated item ID: $RESPONSE"
