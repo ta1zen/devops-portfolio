@@ -21,7 +21,7 @@ jobs:
         if: github.event.action == 'opened'
         run: |
           # Add PR to project
-          ITEM_ID=$(gh project item-add --project 4 --content-id ${{ github.event.pull_request.node_id }} --json id -q ".id")
+          ITEM_ID=$(gh project item-add 4 --owner "@me" --url ${{ github.event.pull_request.html_url }} --json id -q ".id")
           echo "PR added with item ID $ITEM_ID"
 
           # Move to Review
@@ -39,21 +39,21 @@ jobs:
               }
             }"
 
-      - name: Move PR to Done when merged
-        if: github.event.action == 'closed' && github.event.pull_request.merged == true
-        run: |
-          # Move PR card to Done
-          ITEM_ID=$(gh project item-list 4 --json id,content --jq ".[] | select(.content.id==\"${{ github.event.pull_request.node_id }}\") | .id")
-          gh api graphql -f query="
-            mutation {
-              updateProjectV2ItemFieldValue(
-                input: {
-                  projectId: \"PVT_kwHOCYwIqs4BCszZ\"
-                  itemId: \"$ITEM_ID\"
-                  fieldId: \"PVTSSF_lAHOCYwIqs4BCszZzg01Zuk\"
-                  value: { singleSelectOptionId: \"98236657\" }
-                }
-              ) {
-                projectV2Item { id }
-              }
-            }"
+      # - name: Move PR to Done when merged
+      #   if: github.event.action == 'closed' && github.event.pull_request.merged == true
+      #   run: |
+      #     # Move PR card to Done
+      #     ITEM_ID=$(gh project item-list 4 --json id,content --jq ".[] | select(.content.id==\"${{ github.event.pull_request.node_id }}\") | .id")
+      #     gh api graphql -f query="
+      #       mutation {
+      #         updateProjectV2ItemFieldValue(
+      #           input: {
+      #             projectId: \"PVT_kwHOCYwIqs4BCszZ\"
+      #             itemId: \"$ITEM_ID\"
+      #             fieldId: \"PVTSSF_lAHOCYwIqs4BCszZzg01Zuk\"
+      #             value: { singleSelectOptionId: \"98236657\" }
+      #           }
+      #         ) {
+      #           projectV2Item { id }
+      #         }
+      #       }"
