@@ -1,10 +1,15 @@
 #!/bin/sh
 
-echo "Running Go tests..."
-go test ./...
-if [ $? -ne 0 ]; then
-  echo "Go tests failed! Push aborted."
-  exit 1
+echo "Checking for Go files..."
+if [ -f "go.mod" ] || [ -n "$(find . -name '*_test.go')" ]; then
+  echo "Running Go tests..."
+  go test ./...
+  if [ $? -ne 0 ]; then
+    echo "Go tests failed! Push aborted."
+    exit 1
+  fi
+else
+  echo "No Go module or test files found, skipping Go tests."
 fi
 
 echo "Running Python tests..."
