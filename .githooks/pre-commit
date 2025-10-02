@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Go linter
+echo "Running golangci-lint..."
+golangci-lint run ./...
+if [ $? -ne 0 ]; then
+  echo "Go linting failed! Commit aborted."
+  exit 1
+fi
+
+# Python flake8
+echo "Running flake8..."
+flake8 .
+if [ $? -ne 0 ]; then
+  echo "Python linting failed! Commit aborted."
+  exit 1
+fi
+
+# Python black
+echo "Running black formatter check..."
+black --check .
+if [ $? -ne 0 ]; then
+  echo "Code not formatted properly (black check failed). Commit aborted."
+  exit 1
+fi
+
+echo "✅ All checks passed!"
